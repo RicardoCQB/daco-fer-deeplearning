@@ -126,3 +126,5 @@ dmypy.json
 
 # CSV Files
 *.csv
+data/.DS_Store
+.DS_Store
