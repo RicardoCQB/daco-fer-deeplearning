@@ -128,3 +128,5 @@ dmypy.json
 *.csv
 data/.DS_Store
 .DS_Store
+data/fer2013/README
+data/fer2013/fer2013.bib
