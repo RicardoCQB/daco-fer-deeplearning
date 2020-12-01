@@ -13,3 +13,6 @@ has a label that determines each emotion and the purpose of the image (train or 
 
 #Atribution of each label to an emotion
 emotions_dic = {0: 'Angry', 1: 'Disgust', 2: 'Fear', 3: 'Happy', 4: 'Sad', 5: 'Surprise', 6: 'Neutral'}
+
+data['emotion_name'] = data['emotion'].map(emotions_dic)
+print(data['emotion_name'])
