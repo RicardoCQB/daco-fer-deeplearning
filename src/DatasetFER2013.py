@@ -16,5 +16,5 @@ class DatasetFER2013:
 
     '''This method dictates how many images of each class and in each fold'''
     def distribute_classes_folds(self, num_folds):
-        
+        # Maybe delete this class later.
         pass
