@@ -4,10 +4,13 @@ import matplotlib.pyplot as plt
 import csv
 from PIL import Image
 
+import utils.utils
+#import torchvision.models as models
+
 ''' This section reads the dataset from the .csv file in the fer2013 folder '''
 data_path_list = ["C:/Users/Ricardo/source/repos/daco-fer-deeplearning/data/fer2013/fer2013.csv", "/Users/esmeraldacruz/Documents/GitHub/daco-fer-deeplearning/data/fer2013/fer2013.csv","C:\\Users\\dtrdu\\Desktop\\Duarte\\Faculdade e Cadeiras\\DACO\\Project\\daco-fer-deeplearning\\data\\fer2013\\fer2013.csv", "C:/Users/Ricardo/source/daco-fer-deeplearning/data/fer2013/fer2013.csv"]
 data=[]
-data = pd.read_csv(data_path_list[3], nrows = 10)
+data = pd.read_csv(data_path_list[3], nrows = 20)
 
 
 ''' The .csv file consists of the pixels of the 48x48 pixels image, and it also
@@ -23,6 +26,5 @@ im_pixel_values = pd.DataFrame(im_pixel_values, dtype=int)
 images = im_pixel_values.values
 images = images.astype(np.float)
 
-im_test = images[1].reshape(48, 48)
-im_test = Image.fromarray(im_test) 
-im_test.show()
+utils.utils.show_random(images, emotion_nms_org= data['emotion_name'])
+plt.show()
