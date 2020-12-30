@@ -3,6 +3,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import csv
 from PIL import Image
+from sklearn.model_selection import train_test_split
+
 from utils.utils import show_random, dense_to_one_hot
 #import torchvision.models as models
 
@@ -41,9 +43,22 @@ labels_flat = data['emotion'].values.ravel()
 labels_count = np.unique(labels_flat).shape[0]
 #print(labels_count) # Low image reading can cause lower class count
 
+# Flat vector with labels turned into matrix in which row represents a matrix.
+# The '1' in each row represents the labeled emotion for that given image.
 labels = dense_to_one_hot(labels_flat, labels_count)
 labels = labels.astype(np.uint8)
 
+
+'''Image reshaping and dataset splitting'''
+# Reshaping and preparing image format for the model training.
+images = images.reshape(images.shape[0], 48, 48, 1)
+images = images.astype('float32')
+
+# Splitting images and labels into training, validation and testing sets
+X_train, X_test, y_train, y_test = train_test_split(images, labels, test_size=0.1, shuffle = False)
+X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.1, shuffle = False)
+
+#Note: if we are doing k cross validation then the val split is unnecessary and we need to substitute it.
 
 #TODO: Do stratified k cross fold validation
 #TODO: Build and compile model
