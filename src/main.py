@@ -3,7 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import csv
 from PIL import Image
-from utils.utils import show_random
+from utils.utils import show_random, dense_to_one_hot
 #import torchvision.models as models
 
 
@@ -36,24 +36,13 @@ pixel_std = np.std(images, axis=0)
 images = np.divide(np.subtract(images, pixel_mean), pixel_std)
 
 ''' This section of code flattens the labels vector and counts how many classes the dataset has.
-After that, it is created a one-hot vector to store each class count'''
+After that, it is created a one-hot vector to store each class as a 0 or a 1.'''
 labels_flat = data['emotion'].values.ravel()
 labels_count = np.unique(labels_flat).shape[0]
-print(labels_count) # Low image reading can cause lower class count
-
-# Function for creating zero/ones matrix indicating image label
-def dense_to_one_hot(labels_dense, num_classes):
-    num_labels = labels_dense.shape[0]
-    index_offset = np.arange(num_labels) * num_classes
-    labels_one_hot = np.zeros((num_labels, num_classes))
-    labels_one_hot.flat[[index_offset + labels_dense.ravel()]] = 1
-    return labels_one_hot
-
+#print(labels_count) # Low image reading can cause lower class count
 
 labels = dense_to_one_hot(labels_flat, labels_count)
 labels = labels.astype(np.uint8)
-
-
 
 
 #TODO: Do stratified k cross fold validation
