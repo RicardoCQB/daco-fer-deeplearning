@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import csv
 from PIL import Image
 from sklearn.model_selection import train_test_split
+from models import resnet
 
 from utils.utils import show_random, dense_to_one_hot
 #import torchvision.models as models
@@ -59,6 +60,10 @@ X_train, X_test, y_train, y_test = train_test_split(images, labels, test_size=0.
 X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.1, shuffle = False)
 
 #Note: if we are doing k cross validation then the val split is unnecessary and we need to substitute it.
+
+''' This part of the code is for building the CNN model we are using  for the train'''
+ccn_model = resnet.ResNet18()
+
 
 #TODO: Do stratified k cross fold validation
 #TODO: Build and compile model
