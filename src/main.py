@@ -4,11 +4,17 @@ import matplotlib.pyplot as plt
 import csv
 from PIL import Image
 from sklearn.model_selection import train_test_split
+import torch.nn
 from models import resnet
+from utils.utils import *
+import torchvision
 
-from utils.utils import show_random, dense_to_one_hot
-#import torchvision.models as models
-
+import torch
+import torch.nn as nn
+import torch.optim as optim
+import torch.nn.functional as F
+import torch.backends.cudnn as cudnn
+from torch.utils.data import Dataset, DataLoader
 
 ''' This section reads the dataset from the .csv file in the fer2013 folder '''
 data_path_list = ["C:/Users/Ricardo/source/repos/daco-fer-deeplearning/data/fer2013/fer2013.csv", "/Users/esmeraldacruz/Documents/GitHub/daco-fer-deeplearning/data/fer2013/fer2013.csv","C:\\Users\\dtrdu\\Desktop\\Duarte\\Faculdade e Cadeiras\\DACO\\Project\\daco-fer-deeplearning\\data\\fer2013\\fer2013.csv", "C:/Users/Ricardo/source/daco-fer-deeplearning/data/fer2013/fer2013.csv"]
@@ -29,8 +35,8 @@ im_pixel_values = pd.DataFrame(im_pixel_values, dtype=int)
 images = im_pixel_values.values
 images = images.astype(np.float)
 
-#show_random(images, emotion_nms_org= data['emotion_name'])
-#plt.show()
+show_random(images, emotion_nms_org= data['emotion_name'])
+plt.show()
 
 ''' The following section is for image normalization.
 The mean pixel intensity is calculated and subtracted to each image of the dataset.'''
@@ -54,6 +60,8 @@ labels = labels.astype(np.uint8)
 # Reshaping and preparing image format for the model training.
 images = images.reshape(images.shape[0], 48, 48, 1)
 images = images.astype('float32')
+train_loader = torch.utils.data.DataLoader(images, batch_size=16, shuffle=True, num_workers=0) # num_workers???
+
 
 # Splitting images and labels into training, validation and testing sets
 X_train, X_test, y_train, y_test = train_test_split(images, labels, test_size=0.1, shuffle = False)
@@ -62,9 +70,62 @@ X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.
 #Note: if we are doing k cross validation then the val split is unnecessary and we need to substitute it.
 
 ''' This part of the code is for building the CNN model we are using  for the train'''
-ccn_model = resnet.ResNet18()
+net = resnet.ResNet18()
+
+criterion = nn.CrossEntropyLoss()
+optim = 'Adam'
+lr=1e-3  # Default learning rate
+weight_decay=1e-4
+epoch = 150
+logspace = 0
+
+if optim == 'SGD':
+    optimizer = optim.SGD(net.parameters(), lr=lr, momentum=0.9, weight_decay=weight_decay)
+elif optim == 'Adam':
+    optimizer = optim.Adam(net.parameters(), lr=lr, weight_decay=weight_decay)
+logspace_lr = torch.logspace(np.log10(lr), np.log10(lr) - logspace, epoch)
+
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
+best_acc_val = 0  # best test accuracy
+best_acc_test = 0  # best test accuracy
+start_epoch = 0  # start from epoch 0
 
 
+# Training
+def train(epoch):
+    print('\nEpoch: %d' % epoch)
+    net.train()
+
+    train_loss = 0
+    correct = 0
+    total = 0
+    loss_res = 0
+
+    adjust_learning_rate(optimizer, epoch, lr)
+
+    for batch_idx, (inputs, targets) in enumerate(train_loader):
+        inputs, targets = inputs.to(device), targets.to(device)
+        optimizer.zero_grad()
+        outputs = net(inputs)
+        prob = F.softmax(outputs, dim=1)
+        loss = criterion(outputs, targets)
+        loss.backward()
+        # clip_grad_norm_(parameters=net.parameters(), max_norm=0.1)
+
+        optimizer.step()
+
+        train_loss += loss.item()
+        loss_res = train_loss / (batch_idx + 1)
+
+        max_num, predicted = prob.max(1)
+
+        total += targets.size(0)
+        correct += predicted.eq(targets).sum().item()
+        progress_bar(batch_idx, len(train_loader), 'Loss: %.3f | Acc: %.3f%% (%d/%d)'
+                     % (train_loss / (batch_idx + 1), 100. * correct / total, correct, total))
+
+        # print('Loss: %.3f | Acc: %.3f%% (%d/%d)' % (train_loss / (batch_idx + 1), 100. * correct / total, correct, total))
+    return loss_res
 #TODO: Do stratified k cross fold validation
 #TODO: Build and compile model
 #TODO: Try and test to see accuracy with resnet18
