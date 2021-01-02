@@ -3,6 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from PIL import Image
 from sklearn.model_selection import train_test_split
+from tensorflow.python.keras.callbacks import History
 
 from models import resnet
 from utils.utils import *
@@ -138,16 +139,16 @@ filepath = 'Model_NetWorkGithub_1.hdf5'
 checkpointer = ModelCheckpoint(filepath, monitor='val_loss', verbose=1, save_best_only=True, mode='auto')
 tensorboard = TensorBoard(log_dir='./logs')
 
-
-history = model.fit(datagen.flow(X_train, y_train,
+history_object = History()
+history_object = model.fit(datagen.flow(X_train, y_train,
                     batch_size=16),
-                    epochs=300,
+                    epochs=1,
                     validation_data=(X_val, y_val),
                     steps_per_epoch=X_train.shape[0]/16,
                     callbacks=[checkpointer,tensorboard]),
 
-
-pd.DataFrame(history.history).to_csv("history.csv")
+print(history_object[0])
+pd.DataFrame(history_object[0].history).to_csv("history.csv")
 
 
 #TODO: Do stratified k cross fold validation
