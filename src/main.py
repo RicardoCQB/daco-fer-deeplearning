@@ -20,7 +20,7 @@ import tensorflow as tf
 ''' This section reads the dataset from the .csv file in the fer2013 folder '''
 data_path_list = ["C:/Users/Ricardo/source/repos/daco-fer-deeplearning/data/fer2013/fer2013.csv", "/Users/esmeraldacruz/Documents/GitHub/daco-fer-deeplearning/data/fer2013/fer2013.csv","C:\\Users\\dtrdu\\Desktop\\Duarte\\Faculdade e Cadeiras\\DACO\\Project\\daco-fer-deeplearning\\data\\fer2013\\fer2013.csv", "C:/Users/Ricardo/source/daco-fer-deeplearning/data/fer2013/fer2013.csv"]
 data=[]
-data = pd.read_csv(data_path_list[3], nrows = 1000)
+data = pd.read_csv(data_path_list[3])
 
 
 ''' The .csv file consists of the pixels of the 48x48 pixels image, and it also
@@ -135,14 +135,14 @@ datagen.fit(X_train)
 
 
 # Saving model each time it achieves lower loss on the validation set
-filepath = 'Model.1.hdf5'
+filepath = 'Model_NetWorkGithub_1.hdf5'
 checkpointer = ModelCheckpoint(filepath, monitor='val_loss', verbose=1, save_best_only=True, mode='auto')
 tensorboard = TensorBoard(log_dir='./logs')
 
 
 history = model.fit_generator(datagen.flow(X_train, y_train,
                     batch_size=16),
-                    epochs=10,
+                    epochs=300,
                     validation_data=(X_val, y_val),
                     steps_per_epoch=X_train.shape[0]/32,
                     callbacks=[checkpointer,tensorboard]),
