@@ -3,7 +3,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from PIL import Image
 from sklearn.model_selection import train_test_split
-from tensorflow.python.keras.callbacks import History
 
 from utils.utils import *
 from evaluation.eval_pred_utils import *
@@ -145,7 +144,7 @@ tensorboard = TensorBoard(log_dir='./logs')
 
 history_object = model.fit(datagen.flow(X_train, y_train,
                     batch_size=16),
-                    epochs=5,
+                    epochs=50,
                     validation_data=(X_val, y_val),
                     steps_per_epoch=X_train.shape[0]/16,
                     callbacks=[checkpointer, tensorboard]),
