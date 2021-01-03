@@ -21,7 +21,9 @@ from tensorflow.python.keras.models import load_model
 ''' This section reads the dataset from the .csv file in the fer2013 folder '''
 data_path_list = ["C:/Users/Ricardo/source/repos/daco-fer-deeplearning/data/fer2013/fer2013.csv", "/Users/esmeraldacruz/Documents/GitHub/daco-fer-deeplearning/data/fer2013/fer2013.csv","C:\\Users\\dtrdu\\Desktop\\Duarte\\Faculdade e Cadeiras\\DACO\\Project\\daco-fer-deeplearning\\data\\fer2013\\fer2013.csv", "C:/Users/Ricardo/source/daco-fer-deeplearning/data/fer2013/fer2013.csv"]
 data=[]
-data = pd.read_csv(data_path_list[3], nrows=100)
+num_images_to_read = 150
+#data = pd.read_csv(data_path_list[3], nrows=num_images_to_read)
+data = pd.read_csv(data_path_list[3])
 
 
 ''' The .csv file consists of the pixels of the 48x48 pixels image, and it also
@@ -37,6 +39,7 @@ im_pixel_values = pd.DataFrame(im_pixel_values, dtype=int)
 images = im_pixel_values.values
 images = images.astype(np.float)
 
+#test_idx_start = int(num_images_to_read*0.9)
 test_idx_start = 32298
 images_test = images[test_idx_start:]
 
@@ -170,6 +173,11 @@ results_df['True_emotion'] = results_df['Original_label'].map(emotions_names)
 visualize_predictions(images_test, results_df['True_emotion'], results_df['Predicted_emotion'], correct,
                       valid=True, model_name=model_name)
 
+visualize_predictions(images_test, results_df['True_emotion'], results_df['Predicted_emotion'], correct,
+                      valid=False, model_name=model_name)
+
+create_confmat(results_df['Original_label'], results_df['Predicted_label'],
+               ['Angry', 'Disgust', 'Fear', 'Happy', 'Sad', 'Surprise', 'Neutral'], colour='Greens')
+
 #TODO: Do stratified k cross fold validation
-#TODO: Build and compile model
-#TODO: Try and test to see accuracy with resnet18
+

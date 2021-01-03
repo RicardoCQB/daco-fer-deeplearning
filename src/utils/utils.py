@@ -22,9 +22,10 @@ def show_random(imgs, emotion_nms_org = None, emotion_nms_pred = None, random = 
     """
 
     if random == True:
-        indices = np.random.randint(0, len(imgs), size = 15)
+        indices = np.random.randint(0, len(imgs), size=15)
     else:
-        indices = np.random.choice(list(indices), size = 15, replace = False)
+        print(len(indices))
+        indices = np.random.choice(list(indices), size=15, replace=False)
     plt.figure(figsize=(20, 14))
     for index, number in enumerate(indices):
         plt.subplot(3 ,5, index + 1)
