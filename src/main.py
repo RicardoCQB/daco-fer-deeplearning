@@ -7,14 +7,15 @@ from tensorflow.python.keras.callbacks import History
 
 from models import resnet
 from utils.utils import *
+from evaluation.eval_pred_utils import *
 
-from sklearn.metrics import confusion_matrix
 from keras.models import Sequential, load_model
 from keras.layers import Conv2D, MaxPooling2D, Dense, Activation, Dropout, Flatten, BatchNormalization
 from keras.optimizers import Adam
 from keras.initializers import RandomNormal
 from keras.callbacks import ModelCheckpoint, TensorBoard
 from keras.preprocessing.image import ImageDataGenerator
+from tensorflow.python.keras.models import load_model
 
 
 ''' This section reads the dataset from the .csv file in the fer2013 folder '''
@@ -27,9 +28,9 @@ data = pd.read_csv(data_path_list[3])
 has a label that determines each emotion and the purpose of the image (train or test) '''
 
 # Atribution of each label to an emotion
-emotions_dic = {0: 'Angry', 1: 'Disgust', 2: 'Fear', 3: 'Happy', 4: 'Sad', 5: 'Surprise', 6: 'Neutral'}
+emotions_names = {0: 'Angry', 1: 'Disgust', 2: 'Fear', 3: 'Happy', 4: 'Sad', 5: 'Surprise', 6: 'Neutral'}
 
-data['emotion_name'] = data['emotion'].map(emotions_dic)
+data['emotion_name'] = data['emotion'].map(emotions_names)
 
 im_pixel_values = data.pixels.str.split(" ").tolist()
 im_pixel_values = pd.DataFrame(im_pixel_values, dtype=int)
@@ -141,13 +142,31 @@ tensorboard = TensorBoard(log_dir='./logs')
 history_object = History()
 history_object = model.fit(datagen.flow(X_train, y_train,
                     batch_size=16),
-                    epochs=150,
+                    epochs=50,
                     validation_data=(X_val, y_val),
                     steps_per_epoch=X_train.shape[0]/16,
                     callbacks=[checkpointer,tensorboard]),
 
-pd.DataFrame(history_object[0].history).to_csv("history.csv")
+pd.DataFrame(history_object[0].history).to_csv("{}_history.csv".format(filepath))
 
+#Loading the model and reading it's scores
+
+model_name = 'Model_NetWorkGithub_1.hdf5'
+model_loaded = load_model(model_name)
+
+scores = model_loaded.evaluate(np.array(X_test), np.array(y_test), batch_size=256)
+print("Loss: " + str(scores[0]))
+print("Accuracy: " + str(scores[1]))
+
+history = pd.read_csv('history.csv', usecols = ['acc','loss','val_acc','val_loss'])
+plot_accuracy(history)
+plot_loss(history)
+
+correct, results_df = predict_classes(model_loaded, X_test, y_test, emotions_names, batch_size = 256)
+results_df['Original_label'] = data['emotion'][32298:].values
+results_df['True_emotion'] = results_df['Original_label'].map(emotions_names)
+
+visualize_predictions(images_test, results_df['True_emotion'], results_df['Predicted_emotion'], correct, valid = True)
 
 #TODO: Do stratified k cross fold validation
 #TODO: Build and compile model
