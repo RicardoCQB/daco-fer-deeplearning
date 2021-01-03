@@ -5,7 +5,6 @@ from PIL import Image
 from sklearn.model_selection import train_test_split
 from tensorflow.python.keras.callbacks import History
 
-from models import resnet
 from utils.utils import *
 from evaluation.eval_pred_utils import *
 
@@ -22,8 +21,9 @@ from tensorflow.python.keras.models import load_model
 data_path_list = ["C:/Users/Ricardo/source/repos/daco-fer-deeplearning/data/fer2013/fer2013.csv", "/Users/esmeraldacruz/Documents/GitHub/daco-fer-deeplearning/data/fer2013/fer2013.csv","C:\\Users\\dtrdu\\Desktop\\Duarte\\Faculdade e Cadeiras\\DACO\\Project\\daco-fer-deeplearning\\data\\fer2013\\fer2013.csv", "C:/Users/Ricardo/source/daco-fer-deeplearning/data/fer2013/fer2013.csv"]
 data=[]
 num_images_to_read = 150
-#data = pd.read_csv(data_path_list[3], nrows=num_images_to_read)
-data = pd.read_csv(data_path_list[3])
+print('Reading data now...')
+#data = pd.read_csv(data_path_list[0], nrows=num_images_to_read)
+data = pd.read_csv(data_path_list[0])
 
 
 ''' The .csv file consists of the pixels of the 48x48 pixels image, and it also
