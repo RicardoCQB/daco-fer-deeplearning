@@ -21,7 +21,7 @@ from tensorflow.python.keras.models import load_model
 ''' This section reads the dataset from the .csv file in the fer2013 folder '''
 data_path_list = ["C:/Users/Ricardo/source/repos/daco-fer-deeplearning/data/fer2013/fer2013.csv", "/Users/esmeraldacruz/Documents/GitHub/daco-fer-deeplearning/data/fer2013/fer2013.csv","C:\\Users\\dtrdu\\Desktop\\Duarte\\Faculdade e Cadeiras\\DACO\\Project\\daco-fer-deeplearning\\data\\fer2013\\fer2013.csv", "C:/Users/Ricardo/source/daco-fer-deeplearning/data/fer2013/fer2013.csv"]
 data=[]
-data = pd.read_csv(data_path_list[3])
+data = pd.read_csv(data_path_list[3], nrows=100)
 
 
 ''' The .csv file consists of the pixels of the 48x48 pixels image, and it also
@@ -37,7 +37,8 @@ im_pixel_values = pd.DataFrame(im_pixel_values, dtype=int)
 images = im_pixel_values.values
 images = images.astype(np.float)
 
-#show_random(images, emotion_nms_org= data['emotion_name'])
+test_idx_start = 32298
+images_test = images[test_idx_start:]
 
 ''' The following section is for image normalization.
 The mean pixel intensity is calculated and subtracted to each image of the dataset.'''
@@ -49,7 +50,6 @@ images = np.divide(np.subtract(images, pixel_mean), pixel_std)
 After that, it is created a one-hot vector to store each class as a 0 or a 1.'''
 labels_flat = data['emotion'].values.ravel()
 labels_count = np.unique(labels_flat).shape[0]
-#print(labels_count) # Low image reading can cause lower class count
 
 # Flat vector with labels turned into matrix in which row represents a matrix.
 # The '1' in each row represents the labeled emotion for that given image.
@@ -136,37 +136,39 @@ datagen.fit(X_train)
 
 # Saving model each time it achieves lower loss on the validation set
 filepath = 'Model_NetWorkGithub_1.hdf5'
+history_filepath = "{}_history.csv".format(filepath)
 checkpointer = ModelCheckpoint(filepath, monitor='val_loss', verbose=1, save_best_only=True, mode='auto')
 tensorboard = TensorBoard(log_dir='./logs')
 
-history_object = History()
 history_object = model.fit(datagen.flow(X_train, y_train,
                     batch_size=16),
-                    epochs=50,
+                    epochs=5,
                     validation_data=(X_val, y_val),
                     steps_per_epoch=X_train.shape[0]/16,
-                    callbacks=[checkpointer,tensorboard]),
+                    callbacks=[checkpointer, tensorboard]),
 
-pd.DataFrame(history_object[0].history).to_csv("{}_history.csv".format(filepath))
+pd.DataFrame(history_object[0].history).to_csv(history_filepath)
 
 #Loading the model and reading it's scores
 
-model_name = 'Model_NetWorkGithub_1.hdf5'
+model_name = filepath
 model_loaded = load_model(model_name)
 
 scores = model_loaded.evaluate(np.array(X_test), np.array(y_test), batch_size=256)
 print("Loss: " + str(scores[0]))
 print("Accuracy: " + str(scores[1]))
 
-history = pd.read_csv('history.csv', usecols = ['acc','loss','val_acc','val_loss'])
-plot_accuracy(history)
-plot_loss(history)
+#history = pd.read_csv(history_filepath, usecols = ['acc','loss','val_acc','val_loss'])
+history = pd.read_csv(history_filepath, usecols = ['loss','accuracy','val_loss','val_accuracy'])
+plot_accuracy(history, model_name=model_name)
+plot_loss(history, model_name=model_name)
 
 correct, results_df = predict_classes(model_loaded, X_test, y_test, emotions_names, batch_size = 256)
-results_df['Original_label'] = data['emotion'][32298:].values
+results_df['Original_label'] = data['emotion'][test_idx_start:].values
 results_df['True_emotion'] = results_df['Original_label'].map(emotions_names)
 
-visualize_predictions(images_test, results_df['True_emotion'], results_df['Predicted_emotion'], correct, valid = True)
+visualize_predictions(images_test, results_df['True_emotion'], results_df['Predicted_emotion'], correct,
+                      valid=True, model_name=model_name)
 
 #TODO: Do stratified k cross fold validation
 #TODO: Build and compile model

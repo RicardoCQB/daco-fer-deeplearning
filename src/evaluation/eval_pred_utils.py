@@ -1,4 +1,5 @@
-import matplotlib as plt
+import matplotlib.pyplot as plt
+from matplotlib import figure
 import numpy as np
 import pandas as pd
 import seaborn as sns
@@ -7,9 +8,9 @@ from sklearn.metrics import confusion_matrix
 
 
 def plot_accuracy(data, size=(20, 10), model_name=''):
-    plt.figure(figsize=size)
-    plt.plot(data['acc'])
-    plt.plot(data['val_acc'])
+    figure.Figure(figsize=size)
+    plt.plot(data['accuracy'])
+    plt.plot(data['val_accuracy'])
     plt.title('Model Accuracy', fontsize=18)
     plt.ylabel('Accuracy', fontsize=18)
     plt.xlabel('Epoch', fontsize=18)
@@ -20,7 +21,7 @@ def plot_accuracy(data, size=(20, 10), model_name=''):
 
 
 def plot_loss(data, size=(20, 10), model_name=''):
-    plt.figure(figsize=size)
+    figure.Figure(figsize=size)
     plt.plot(data['loss'])
     plt.plot(data['val_loss'])
     plt.title('Model Loss', fontsize=18)
@@ -53,17 +54,21 @@ def predict_classes(model, test_imgs, test_labels, emotions_dict, batch_size=32)
     return correct, results
 
 
-def visualize_predictions(images_test, orglabel_names, predlabel_names, correct_arr, valid=True):
+def visualize_predictions(images_test, orglabel_names, predlabel_names, correct_arr, valid=True, model_name=''):
     if valid == True:
         correct = np.array(np.where(correct_arr == True))[0]
         # Plot 15 randomly selected and correctly predicted images
         show_random(images_test, emotion_nms_org=orglabel_names, emotion_nms_pred=predlabel_names, random=False,
                     indices=correct)
+        plt.show()
+        plt.savefig('{}_correct_prediction_examples.png'.format(model_name))
     else:
         incorrect = np.array(np.where(correct_arr == False))[0]
         # Plot 15 randomly selected and wrongly predicted images
         show_random(images_test, emotion_nms_org=orglabel_names, emotion_nms_pred=predlabel_names, random=False,
                     indices=incorrect)
+        plt.show()
+        plt.savefig('{}_incorrect_prediction_examples.png'.format(model_name))
 
 
 def create_confmat(true_labels, predicted_labels, columns, colour='Oranges', size=(20, 14), model_name=''):

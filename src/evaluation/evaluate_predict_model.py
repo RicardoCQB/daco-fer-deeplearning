@@ -17,8 +17,11 @@ print("Loss: " + str(scores[0]))
 print("Accuracy: " + str(scores[1]))
 
 history = pd.read_csv('history.csv', usecols = ['acc','loss','val_acc','val_loss'])
-plot_accuracy(history)
-plot_loss(history)
+
+# Plot and save accuracy and loss graphs
+plot_accuracy(history, model_name=model_name)
+plot_loss(history, model_name=model_name)
+
 
 
 
