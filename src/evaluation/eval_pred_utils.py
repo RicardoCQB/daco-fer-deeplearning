@@ -6,7 +6,7 @@ from src.utils.utils import show_random
 from sklearn.metrics import confusion_matrix
 
 
-def plot_accuracy(data, size=(20, 10)):
+def plot_accuracy(data, size=(20, 10), model_name=''):
     plt.figure(figsize=size)
     plt.plot(data['acc'])
     plt.plot(data['val_acc'])
@@ -16,9 +16,10 @@ def plot_accuracy(data, size=(20, 10)):
     plt.legend(['Train', 'Test'], loc='upper left', fontsize=16)
     plt.tick_params(axis='both', labelsize=14)
     plt.show()
+    plt.savefig('{}_accuracy.png'.format(model_name))
 
 
-def plot_loss(data, size=(20, 10)):
+def plot_loss(data, size=(20, 10), model_name=''):
     plt.figure(figsize=size)
     plt.plot(data['loss'])
     plt.plot(data['val_loss'])
@@ -29,6 +30,8 @@ def plot_loss(data, size=(20, 10)):
     plt.legend(['Train', 'Test'], loc='upper left', fontsize=16)
     plt.tick_params(axis='both', labelsize=14)
     plt.show()
+    plt.savefig('{}_loss.png'.format(model_name))
+
 
 
 def predict_classes(model, test_imgs, test_labels, emotions_dict, batch_size=32):
@@ -63,7 +66,7 @@ def visualize_predictions(images_test, orglabel_names, predlabel_names, correct_
                     indices=incorrect)
 
 
-def create_confmat(true_labels, predicted_labels, columns, colour='Oranges', size=(20, 14)):
+def create_confmat(true_labels, predicted_labels, columns, colour='Oranges', size=(20, 14), model_name=''):
     cm = confusion_matrix(true_labels, predicted_labels)
     cm_df = pd.DataFrame(cm,
                          index=[col for col in columns],
@@ -75,3 +78,4 @@ def create_confmat(true_labels, predicted_labels, columns, colour='Oranges', siz
     plt.xlabel('Predicted label', fontsize=18)
     plt.tick_params(axis='both', labelsize=14)
     plt.show()
+    plt.savefig('{}_confmat.png'.format(model_name))
