@@ -137,14 +137,14 @@ datagen.fit(X_train)
 
 
 # Saving model each time it achieves lower loss on the validation set
-filepath = 'Model_NetWorkGithub_1.hdf5'
+filepath = 'Model_NetWorkGithub_2_150_Epochs.hdf5'
 history_filepath = "{}_history.csv".format(filepath)
 checkpointer = ModelCheckpoint(filepath, monitor='val_loss', verbose=1, save_best_only=True, mode='auto')
 tensorboard = TensorBoard(log_dir='./logs')
 
 history_object = model.fit(datagen.flow(X_train, y_train,
                     batch_size=16),
-                    epochs=50,
+                    epochs=150,
                     validation_data=(X_val, y_val),
                     steps_per_epoch=X_train.shape[0]/16,
                     callbacks=[checkpointer, tensorboard]),
