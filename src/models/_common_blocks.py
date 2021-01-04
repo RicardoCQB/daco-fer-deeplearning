@@ -1,4 +1,4 @@
-from classification_models import get_submodules_from_kwargs
+from __init__ import get_submodules_from_kwargs
 
 
 def slice_tensor(x, start, stop, axis):
