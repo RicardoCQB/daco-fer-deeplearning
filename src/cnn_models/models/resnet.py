@@ -3,8 +3,8 @@ import collections
 
 
 from ._common_blocks import ChannelSE
-from . import get_submodules_from_kwargs
-from .weights import load_model_weights
+from .. import get_submodules_from_kwargs
+from ..weights import load_model_weights
 
 backend = None
 layers = None
@@ -176,6 +176,7 @@ def ResNet(model_params, input_shape=None, input_tensor=None, include_top=True,
     Optionally loads weights pre-trained on ImageNet.
     Note that the data format convention used by the model is
     the one specified in your Keras config at `~/.keras/keras.json`.
+
     Args:
         include_top: whether to include the fully-connected
             layer at the top of the network.
@@ -193,8 +194,10 @@ def ResNet(model_params, input_shape=None, input_tensor=None, include_top=True,
         classes: optional number of classes to classify images
             into, only to be specified if `include_top` is True, and
             if no `weights` argument is specified.
+
     Returns:
         A Keras model instance.
+
     Raises:
         ValueError: in case of invalid argument for `weights`,
             or invalid input shape.

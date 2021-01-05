@@ -1,4 +1,4 @@
-from __init__ import get_submodules_from_kwargs
+from .. import get_submodules_from_kwargs
 
 
 def slice_tensor(x, start, stop, axis):
@@ -22,6 +22,7 @@ def GroupConv2D(filters,
     """
     Grouped Convolution Layer implemented as a Slice,
     Conv2D and Concatenate layers. Split filters to groups, apply Conv2D and concatenate back.
+
     Args:
         filters: Integer, the dimensionality of the output space
             (i.e. the number of output filters in the convolution).
@@ -35,11 +36,14 @@ def GroupConv2D(filters,
         activation: Activation function to use (see activations).
             If you don't specify anything, no activation is applied (ie. "linear" activation: a(x) = x).
         padding: one of "valid" or "same" (case-insensitive).
+
     Input shape:
         4D tensor with shape: (batch, rows, cols, channels) if data_format is "channels_last".
+
     Output shape:
         4D tensor with shape: (batch, new_rows, new_cols, filters) if data_format is "channels_last".
         rows and cols values might have changed due to padding.
+
     """
 
     backend, layers, models, keras_utils = get_submodules_from_kwargs(kwargs)
@@ -85,8 +89,10 @@ def ChannelSE(reduction=16, **kwargs):
     """
     Squeeze and Excitation block, reimplementation inspired by
         https://github.com/Cadene/pretrained-models.pytorch/blob/master/pretrainedmodels/models/senet.py
+
     Args:
         reduction: channels squeeze factor
+
     """
     backend, layers, models, keras_utils = get_submodules_from_kwargs(kwargs)
     channels_axis = 3 if backend.image_data_format() == 'channels_last' else 1

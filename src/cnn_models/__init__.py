@@ -1,4 +1,5 @@
 import keras_applications as ka
+from .__version__ import __version__
 
 
 def get_submodules_from_kwargs(kwargs):

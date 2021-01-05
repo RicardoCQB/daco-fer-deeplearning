@@ -6,7 +6,8 @@ from sklearn.model_selection import train_test_split
 
 from utils.utils import *
 from evaluation.eval_pred_utils import *
-from models import first_cnn
+from cnn_models import first_cnn
+from cnn_models.models import resnet
 
 from keras.models import Sequential, load_model
 from keras.layers import Conv2D, MaxPooling2D, Dense, Activation, Dropout, Flatten, BatchNormalization
@@ -71,7 +72,7 @@ X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.
 
 ''' This part of the code is for building the CNN model we are using  for the train'''
 # Constructing CNN structure
-model = first_cnn.first_cnn()
+model = resnet.ResNet18(input_shape=(224,224,3), weights='imagenet', classes=labels_count)
 
 # Compiling model
 model.compile(loss='categorical_crossentropy', optimizer=Adam(), metrics=['accuracy'])
@@ -96,7 +97,7 @@ datagen.fit(X_train)
 
 
 # Saving model each time it achieves lower loss on the validation set
-filepath = 'Model_NetWorkGithub_2_150_Epochs.hdf5'
+filepath = 'Resnet18_150_Epochs.hdf5'
 history_filepath = "{}_history.csv".format(filepath)
 checkpointer = ModelCheckpoint(filepath, monitor='val_loss', verbose=1, save_best_only=True, mode='auto')
 tensorboard = TensorBoard(log_dir='./logs')
