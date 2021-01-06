@@ -16,6 +16,7 @@ from keras.initializers import RandomNormal
 from keras.callbacks import ModelCheckpoint, TensorBoard
 from keras.preprocessing.image import ImageDataGenerator
 from tensorflow.python.keras.models import load_model
+import tensorflow as tf
 
 
 ''' This section reads the dataset from the .csv file in the fer2013 folder '''
@@ -68,16 +69,18 @@ images = images.astype('float32')
 X_train, X_test, y_train, y_test = train_test_split(images, labels, test_size=0.1, shuffle = False)
 X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.1, shuffle = False)
 
-#Note: if we are doing k cross validation then the val split is unnecessary and we need to substitute it.
+# Note: if we are doing k cross validation then the val split is unnecessary and we need to substitute it.
 
 ''' This part of the code is for building the CNN model we are using  for the train'''
 # Constructing CNN structure
-model = resnet.ResNet18(input_shape=(224,224,3), weights='imagenet', classes=labels_count)
+model = tf.keras.applications.ResNet50(input_shape=(48, 48, 1), classes=labels_count, weights=None)
 
 # Compiling model
 model.compile(loss='categorical_crossentropy', optimizer=Adam(), metrics=['accuracy'])
 
 model.summary()
+
+# Changing images to RGB and resizing them to fit the resnet pretrained model.
 
 # Specifying parameters for Data Augmentation
 datagen = ImageDataGenerator(
@@ -129,14 +132,16 @@ correct, results_df = predict_classes(model_loaded, X_test, y_test, emotions_nam
 results_df['Original_label'] = data['emotion'][test_idx_start:].values
 results_df['True_emotion'] = results_df['Original_label'].map(emotions_names)
 
+create_confmat(results_df['Original_label'], results_df['Predicted_label'],
+               ['Angry', 'Disgust', 'Fear', 'Happy', 'Sad', 'Surprise', 'Neutral'], colour='Greens')
+
 visualize_predictions(images_test, results_df['True_emotion'], results_df['Predicted_emotion'], correct,
                       valid=True, model_name=model_name)
 
 visualize_predictions(images_test, results_df['True_emotion'], results_df['Predicted_emotion'], correct,
                       valid=False, model_name=model_name)
 
-create_confmat(results_df['Original_label'], results_df['Predicted_label'],
-               ['Angry', 'Disgust', 'Fear', 'Happy', 'Sad', 'Surprise', 'Neutral'], colour='Greens')
+
 
 #TODO: Do stratified k cross fold validation
 
