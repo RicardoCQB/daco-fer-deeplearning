@@ -134,5 +134,9 @@ data/.DS_Store
 data/fer2013/README
 data/fer2013/fer2013.bib
 
-#Log Files
+# Log Files
 src/logs/
+
+# Model Files
+*.hdf5
+*.hdf5
