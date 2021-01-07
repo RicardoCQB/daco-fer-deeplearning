@@ -53,7 +53,7 @@ def first_cnn():
     model.add(Flatten())
     # Fully connected layers
     model.add(Dense(2048, activation='relu'))
-    model.add(Dropout(0.5))
+    model.add(Dropout(0.5)) # regularization of cnn for neurons that turn off # search a little about this!!!!
     model.add(Dense(7, activation='softmax')) # 7 is the number of classes
 
     return model

@@ -24,8 +24,8 @@ data_path_list = ["C:/Users/Ricardo/source/repos/daco-fer-deeplearning/data/fer2
 data=[]
 num_images_to_read = 150
 print('Reading data now...')
-#data = pd.read_csv(data_path_list[0], nrows=num_images_to_read)
-data = pd.read_csv(data_path_list[0])
+data = pd.read_csv(data_path_list[3], nrows=num_images_to_read)
+#data = pd.read_csv(data_path_list[0])
 
 
 ''' The .csv file consists of the pixels of the 48x48 pixels image, and it also
@@ -73,7 +73,8 @@ X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.
 
 ''' This part of the code is for building the CNN model we are using  for the train'''
 # Constructing CNN structure
-model = tf.keras.applications.ResNet50(input_shape=(48, 48, 1), classes=labels_count, weights=None)
+model = tf.keras.applications.ResNet50(input_shape=(48, 48, 1), classes=labels_count,
+                                       weights='image_net', include_top=False)
 
 # Compiling model
 model.compile(loss='categorical_crossentropy', optimizer=Adam(), metrics=['accuracy'])
