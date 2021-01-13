@@ -1,34 +1,26 @@
 
-import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
-from PIL import Image
 from sklearn.model_selection import train_test_split
-from tensorflow.python.keras.layers import GlobalAveragePooling2D, Dense
+from tensorflow.python.keras.layers import GlobalAveragePooling2D
 
 from utils.utils import *
 from evaluation.eval_pred_utils import *
 from cnn_models import first_cnn
-from cnn_models.models import resnet
 
-from keras.models import Sequential, load_model
-from keras.layers import Conv2D, MaxPooling2D, Dense, Activation, Dropout, Flatten, BatchNormalization
+from keras.models import Sequential
+from keras.layers import Dense
 from keras.optimizers import Adam
-from keras.initializers import RandomNormal
 from keras.callbacks import ModelCheckpoint, TensorBoard
 from keras.preprocessing.image import ImageDataGenerator
 from tensorflow.python.keras.models import load_model
 import tensorflow as tf
-import cv2
-
 
 ''' This section reads the dataset from the .csv file in the fer2013 folder '''
 data_path_list = ["C:/Users/Ricardo/source/repos/daco-fer-deeplearning/data/fer2013/fer2013.csv", "/Users/esmeraldacruz/Documents/GitHub/daco-fer-deeplearning/data/fer2013/fer2013.csv","C:\\Users\\dtrdu\\Desktop\\Duarte\\Faculdade e Cadeiras\\DACO\\Project\\daco-fer-deeplearning\\data\\fer2013\\fer2013.csv", "C:/Users/Ricardo/source/daco-fer-deeplearning/data/fer2013/fer2013.csv"]
-data=[]
+data = []
 num_images_to_read = 150
 print('Reading data now...')
-data = pd.read_csv(data_path_list[3], nrows=num_images_to_read)
-#data = pd.read_csv(data_path_list[0])
+#data = pd.read_csv(data_path_list[3], nrows=num_images_to_read)
+data = pd.read_csv(data_path_list[0])
 
 
 ''' The .csv file consists of the pixels of the 48x48 pixels image, and it also
@@ -66,8 +58,8 @@ labels = labels.astype(np.uint8)
 
 '''Image reshaping and dataset splitting'''
 # Reshaping and preparing image format for the model training.
-images = images.reshape(images.shape[0], 48, 48, 1)
-images2 = np.zeros((150,48,48,3))
+images = images.reshape(num_images_to_read, 48, 48, 1)
+images2 = np.zeros((num_images_to_read, 48, 48, 3))
 
 for i, image in enumerate(images2):
     for j, pix_row in enumerate(image):
@@ -75,20 +67,12 @@ for i, image in enumerate(images2):
             for m, channel in enumerate(pixel):
                 images2[i][j][k][m] = images[i][j][k][0]
 
-
-print(images[0][20][30][0])
-print(images2[0][20][30][2])
-print(images2[0][20][30][1])
-print(images2[0][20][30][0])
-print(images2[0])
-print(images2.shape)
-
-images2 = images.astype('float32')
+images2 = images2.astype('float32')
 
 X_train, X_test, y_train, y_test = train_test_split(images2, labels, test_size=0.1, shuffle = False)
 X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.1, shuffle = False)
 
-# Note: if we are doing k cross validation then the val split is unnecessary and we need to substitute it.
+print(X_train.shape)
 
 ''' This part of the code is for building the CNN model we are using  for the train'''
 # Constructing CNN structure
@@ -104,8 +88,6 @@ model.add(Dense(labels_count, activation='softmax'))
 model.compile(loss='categorical_crossentropy', optimizer=Adam(), metrics=['accuracy'])
 
 model.summary()
-
-# Changing images to RGB and resizing them to fit the resnet pretrained model.
 
 # Specifying parameters for Data Augmentation
 datagen = ImageDataGenerator(
@@ -131,10 +113,10 @@ checkpointer = ModelCheckpoint(filepath, monitor='val_loss', verbose=1, save_bes
 tensorboard = TensorBoard(log_dir='./logs')
 
 history_object = model.fit(datagen.flow(X_train, y_train,
-                    batch_size=32),
+                    batch_size=64),
                     epochs=150,
                     validation_data=(X_val, y_val),
-                    steps_per_epoch=X_train.shape[0]/32,
+                    steps_per_epoch=X_train.shape[0]/64,
                     callbacks=[checkpointer, tensorboard]),
 
 pd.DataFrame(history_object[0].history).to_csv(history_filepath)
@@ -144,16 +126,15 @@ pd.DataFrame(history_object[0].history).to_csv(history_filepath)
 model_name = filepath
 model_loaded = load_model(model_name)
 
-scores = model_loaded.evaluate(np.array(X_test), np.array(y_test), batch_size=1024)
+scores = model_loaded.evaluate(np.array(X_test), np.array(y_test), batch_size=4096)
 print("Loss: " + str(scores[0]))
 print("Accuracy: " + str(scores[1]))
 
-#history = pd.read_csv(history_filepath, usecols = ['acc','loss','val_acc','val_loss'])
 history = pd.read_csv(history_filepath, usecols = ['loss','accuracy','val_loss','val_accuracy'])
 plot_accuracy(history, model_name=model_name)
 plot_loss(history, model_name=model_name)
 
-correct, results_df = predict_classes(model_loaded, X_test, y_test, emotions_names, batch_size = 1024)
+correct, results_df = predict_classes(model_loaded, X_test, y_test, emotions_names, batch_size = 4096)
 results_df['Original_label'] = data['emotion'][test_idx_start:].values
 results_df['True_emotion'] = results_df['Original_label'].map(emotions_names)
 
