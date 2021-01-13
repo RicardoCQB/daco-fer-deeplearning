@@ -58,8 +58,10 @@ labels = labels.astype(np.uint8)
 
 '''Image reshaping and dataset splitting'''
 # Reshaping and preparing image format for the model training.
-images = images.reshape(num_images_to_read, 48, 48, 1)
-images2 = np.zeros((num_images_to_read, 48, 48, 3))
+num_images = images.shape[0]
+images = images.reshape(num_images, 48, 48, 1)
+
+images2 = np.zeros((num_images, 48, 48, 3))
 
 for i, image in enumerate(images2):
     for j, pix_row in enumerate(image):
@@ -98,21 +100,21 @@ datagen = ImageDataGenerator(
     height_shift_range=0.2,  # randomly shift images vertically (fraction of total height)
     horizontal_flip=True,  # randomly flip images
     vertical_flip=False,
-    zoom_range = 0.05)  # zoom images in range [1 - zoom_range, 1+ zoom_range]
+    zoom_range=0.05)  # zoom images in range [1 - zoom_range, 1+ zoom_range]
 
 datagen.fit(X_train)
 
 # Saving model each time it achieves lower loss on the validation set
-filepath = 'Resnet18_150_Epochs.hdf5'
+filepath = 'Resnet50_150_Epochs.hdf5'
 history_filepath = "{}_history.csv".format(filepath)
 checkpointer = ModelCheckpoint(filepath, monitor='val_loss', verbose=1, save_best_only=True, mode='auto')
 tensorboard = TensorBoard(log_dir='./logs')
 
 history_object = model.fit(datagen.flow(X_train, y_train,
-                    batch_size=64),
+                    batch_size=32),
                     epochs=150,
                     validation_data=(X_val, y_val),
-                    steps_per_epoch=X_train.shape[0]/64,
+                    steps_per_epoch=X_train.shape[0]/32,
                     callbacks=[checkpointer, tensorboard]),
 
 pd.DataFrame(history_object[0].history).to_csv(history_filepath)
@@ -122,7 +124,7 @@ pd.DataFrame(history_object[0].history).to_csv(history_filepath)
 model_name = filepath
 model_loaded = load_model(model_name)
 
-scores = model_loaded.evaluate(np.array(X_test), np.array(y_test), batch_size=4096)
+scores = model_loaded.evaluate(np.array(X_test), np.array(y_test), batch_size=1024)
 print("Loss: " + str(scores[0]))
 print("Accuracy: " + str(scores[1]))
 
@@ -130,7 +132,7 @@ history = pd.read_csv(history_filepath, usecols = ['loss','accuracy','val_loss',
 plot_accuracy(history, model_name=model_name)
 plot_loss(history, model_name=model_name)
 
-correct, results_df = predict_classes(model_loaded, X_test, y_test, emotions_names, batch_size = 4096)
+correct, results_df = predict_classes(model_loaded, X_test, y_test, emotions_names, batch_size=1024)
 results_df['Original_label'] = data['emotion'][test_idx_start:].values
 results_df['True_emotion'] = results_df['Original_label'].map(emotions_names)
 

@@ -49,3 +49,16 @@ def dense_to_one_hot(labels_dense, num_classes):
     labels_one_hot = np.zeros((num_labels, num_classes))
     labels_one_hot.flat[[index_offset + labels_dense.ravel()]] = 1
     return labels_one_hot
+
+
+# Function to transform grayscale 4d tensor of images to RGV 4d tensor
+def grayscale_tensor_toRGB(images, num_images):
+    images2 = np.zeros((num_images, 48, 48, 3))
+
+    for i, image in enumerate(images2):
+        for j, pix_row in enumerate(image):
+            for k, pixel in enumerate(pix_row):
+                for m, channel in enumerate(pixel):
+                    images2[i][j][k][m] = images[i][j][k][0]
+
+    images2 = images2.astype('float32')
