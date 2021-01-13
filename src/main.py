@@ -72,8 +72,6 @@ images2 = images2.astype('float32')
 X_train, X_test, y_train, y_test = train_test_split(images2, labels, test_size=0.1, shuffle = False)
 X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.1, shuffle = False)
 
-print(X_train.shape)
-
 ''' This part of the code is for building the CNN model we are using  for the train'''
 # Constructing CNN structure
 resnet_model = tf.keras.applications.ResNet50(input_shape=(48, 48, 3), classes=labels_count,
@@ -95,7 +93,7 @@ datagen = ImageDataGenerator(
     featurewise_std_normalization=False,  # divide inputs by std of the dataset
     samplewise_std_normalization=False,  # divide each input by its std
     zca_whitening=False,  # apply ZCA whitening
-    rotation_range=40,  # randomly rotate images in the range (degrees, 0 to 180)
+    rotation_range=25,  # randomly rotate images in the range (degrees, 0 to 180)
     width_shift_range=0.2,  # randomly shift images horizontally (fraction of total width)
     height_shift_range=0.2,  # randomly shift images vertically (fraction of total height)
     horizontal_flip=True,  # randomly flip images
