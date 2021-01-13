@@ -78,7 +78,6 @@ print(X_train.shape)
 # Constructing CNN structure
 resnet_model = tf.keras.applications.ResNet50(input_shape=(48, 48, 3), classes=labels_count,
                                        weights='imagenet', include_top=False)
-
 model = Sequential()
 model.add(resnet_model)
 model.add(GlobalAveragePooling2D(data_format='channels_last'))
@@ -104,7 +103,6 @@ datagen = ImageDataGenerator(
     zoom_range = 0.05)  # zoom images in range [1 - zoom_range, 1+ zoom_range]
 
 datagen.fit(X_train)
-
 
 # Saving model each time it achieves lower loss on the validation set
 filepath = 'Resnet18_150_Epochs.hdf5'
