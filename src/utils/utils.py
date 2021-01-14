@@ -67,10 +67,14 @@ def grayscale_tensor_toRGB(images, num_images):
 
     images2 = images2.astype('float32')
 
+    return images2
+
 
 # Function to add the fully connected layer to keras applications models
-def add_fc_layer(model, labels_count):
+def add_fc_layer(prev_model, labels_count):
     model = Sequential()
-    model.add(model)
+    model.add(prev_model)
     model.add(GlobalAveragePooling2D(data_format='channels_last'))
     model.add(Dense(labels_count, activation='softmax'))
+
+    return model
