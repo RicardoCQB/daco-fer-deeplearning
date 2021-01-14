@@ -1,4 +1,5 @@
-
+import numpy as np
+import pandas as pd
 from sklearn.model_selection import train_test_split
 from tensorflow.python.keras.layers import GlobalAveragePooling2D
 
@@ -36,7 +37,6 @@ im_pixel_values = pd.DataFrame(im_pixel_values, dtype=int)
 images = im_pixel_values.values
 images = images.astype(np.float)
 
-#test_idx_start = int(num_images_to_read*0.9)
 test_idx_start = 32298
 images_test = images[test_idx_start:]
 
@@ -61,31 +61,34 @@ labels = labels.astype(np.uint8)
 num_images = images.shape[0]
 images = images.reshape(num_images, 48, 48, 1)
 
-images2 = np.zeros((num_images, 48, 48, 3))
-
-for i, image in enumerate(images2):
-    for j, pix_row in enumerate(image):
-        for k, pixel in enumerate(pix_row):
-            for m, channel in enumerate(pixel):
-                images2[i][j][k][m] = images[i][j][k][0]
-
-images2 = images2.astype('float32')
+images2 = grayscale_tensor_toRGB(images, num_images)
 
 X_train, X_test, y_train, y_test = train_test_split(images2, labels, test_size=0.1, shuffle = False)
 X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.1, shuffle = False)
 
 ''' This part of the code is for building the CNN model we are using  for the train'''
 # Constructing CNN structure
-resnet_model = tf.keras.applications.ResNet50(input_shape=(48, 48, 3), classes=labels_count,
+
+# Experiment 1 - First CNN model
+# model = first_cnn()
+
+# Experiment 2 - Resnet50_150_Epochs with image net weights
+# resnet_model = tf.keras.applications.ResNet50(input_shape=(48, 48, 3), classes=labels_count,
+#                                       weights='imagenet', include_top=False)
+
+# Experiment 3 - Resnet50_150Epochs with random weights initialization
+# resnet_model = tf.keras.applications.ResNet50(input_shape=(48, 48, 3), classes=labels_count,
+#                                       weights=None, include_top=False)
+
+# Experiment 4 - VGG16 with no imagenet weights initialization
+vgg_model = tf.keras.applications.VGG16(input_shape=(48, 48, 3), classes=labels_count,
                                        weights='imagenet', include_top=False)
-model = Sequential()
-model.add(resnet_model)
-model.add(GlobalAveragePooling2D(data_format='channels_last'))
-model.add(Dense(labels_count, activation='softmax'))
+
+# Creation of the fully connected network for the models that have no top layer. (First_cnn has the top layer)
+model = add_fc_layer(vgg_model, labels_count)
 
 # Compiling model
 model.compile(loss='categorical_crossentropy', optimizer=Adam(), metrics=['accuracy'])
-
 model.summary()
 
 # Specifying parameters for Data Augmentation
@@ -105,7 +108,7 @@ datagen = ImageDataGenerator(
 datagen.fit(X_train)
 
 # Saving model each time it achieves lower loss on the validation set
-filepath = 'Resnet50_150_Epochs.hdf5'
+filepath = 'VGG16_150_Epochs_imagenet.hdf5'
 history_filepath = "{}_history.csv".format(filepath)
 checkpointer = ModelCheckpoint(filepath, monitor='val_loss', verbose=1, save_best_only=True, mode='auto')
 tensorboard = TensorBoard(log_dir='./logs')
@@ -144,8 +147,4 @@ visualize_predictions(images_test, results_df['True_emotion'], results_df['Predi
 
 visualize_predictions(images_test, results_df['True_emotion'], results_df['Predicted_emotion'], correct,
                       valid=False, model_name=model_name)
-
-
-
-#TODO: Do stratified k cross fold validation
 

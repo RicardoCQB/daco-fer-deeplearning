@@ -4,6 +4,10 @@ import matplotlib.pyplot as plt
 
 
 # Function for displaying 15 random images
+from tensorflow.python.keras import Sequential
+from tensorflow.python.keras.layers import GlobalAveragePooling2D, Dense
+
+
 def show_random(imgs, emotion_nms_org = None, emotion_nms_pred = None, random = True, indices = None):
     """
 
@@ -62,3 +66,11 @@ def grayscale_tensor_toRGB(images, num_images):
                     images2[i][j][k][m] = images[i][j][k][0]
 
     images2 = images2.astype('float32')
+
+
+# Function to add the fully connected layer to keras applications models
+def add_fc_layer(model, labels_count):
+    model = Sequential()
+    model.add(model)
+    model.add(GlobalAveragePooling2D(data_format='channels_last'))
+    model.add(Dense(labels_count, activation='softmax'))
