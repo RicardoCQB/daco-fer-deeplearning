@@ -5,7 +5,7 @@ from tensorflow.python.keras.layers import GlobalAveragePooling2D
 
 from utils.utils import *
 from evaluation.eval_pred_utils import *
-from cnn_models import first_cnn
+from cnn_models import custom_cnn
 
 from keras.models import Sequential
 from keras.layers import Dense
@@ -70,7 +70,7 @@ X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.
 # Constructing CNN structure
 
 # Experiment 1 - First CNN model
-# model = first_cnn()
+# model = custom_cnn()
 
 # Experiment 2 - Resnet50_150_Epochs with image net weights
 # resnet_model = tf.keras.applications.ResNet50(input_shape=(48, 48, 3), classes=labels_count,

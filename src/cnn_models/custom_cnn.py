@@ -9,7 +9,7 @@ from keras.preprocessing.image import ImageDataGenerator
 from tensorflow.python.keras.models import load_model
 
 
-def first_cnn():
+def custom_cnn():
 
     # Constructing CNN structure
     model = Sequential()
