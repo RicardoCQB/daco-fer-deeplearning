@@ -69,7 +69,7 @@ X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.
 ''' This part of the code is for building the CNN model we are using  for the train'''
 # Constructing CNN structure
 
-# Experiment 1 - First CNN model
+# Experiment 1 - Custom CNN model
 # model = custom_cnn()
 
 # Experiment 2 - Resnet50_150_Epochs with image net weights
