@@ -1,4 +1,4 @@
-''' This is the code of the first used CNN for this project'''
+''' This is the code of the custom CNN for this project'''
 
 from keras.models import Sequential, load_model
 from keras.layers import Conv2D, MaxPooling2D, Dense, Activation, Dropout, Flatten, BatchNormalization

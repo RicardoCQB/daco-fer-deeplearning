@@ -1,4 +1,11 @@
+Here are some references that we used for our project:
+
 https://github.com/justinshenk/fer
 
 https://github.com/amilkh/cs230-fer
 
+https://github.com/elzawie/FER2013
+
+https://github.com/gitshanks/fer2013
+
+https://www.kaggle.com/kilean/emotion-detection-accuracy70

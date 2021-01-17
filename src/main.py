@@ -1,3 +1,10 @@
+''' DACO-FER-PROJECT - Done by Esmeralda Cruz, Duarte Rodrigues and Ricardo Brioso
+The goal of this project was to learn more and implement deep learning applied to facial expression recognition
+(FER), using the FER2013 dataset (public dataset) that was used in the FER2013 Kaggle competition.
+The techniques used and deep learning approaches were inspired on several articles and other deep learning projects
+that are referenced in the Github links .txt file.'''
+
+
 import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
@@ -77,15 +84,15 @@ X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.
 #                                       weights='imagenet', include_top=False)
 
 # Experiment 3 - Resnet50_150Epochs with random weights initialization
-# resnet_model = tf.keras.applications.ResNet50(input_shape=(48, 48, 3), classes=labels_count,
-#                                       weights=None, include_top=False)
+resnet_model = tf.keras.applications.ResNet50(input_shape=(48, 48, 3), classes=labels_count,
+                                      weights=None, include_top=False)
 
-# Experiment 4 - VGG16 with no imagenet weights initialization
-vgg_model = tf.keras.applications.VGG16(input_shape=(48, 48, 3), classes=labels_count,
-                                       weights='imagenet', include_top=False)
+# Experiment 4 - VGG16 with imagenet weights initialization
+# vgg_model = tf.keras.applications.VGG16(input_shape=(48, 48, 3), classes=labels_count,
+#                                      weights='imagenet', include_top=False)
 
 # Creation of the fully connected network for the models that have no top layer. (First_cnn has the top layer)
-model = add_fc_layer(vgg_model, labels_count)
+model = add_fc_layer(resnet_model, labels_count)
 
 # Compiling model
 model.compile(loss='categorical_crossentropy', optimizer=Adam(), metrics=['accuracy'])
